@@ -2,129 +2,92 @@
 <html lang="en">
 <head>
   <link rel="icon" href="Logo.png" type="image/png">
-  <meta charset="UTF-8">
-  <title>Minecraft AI Seed Finder</title>
+  <meta charset="UTF-8" />
+  <title>Enchantment Calculator</title>
   <style>
     body {
-      background-color: #1e1e1e;
-      color: #0f0;
       font-family: monospace;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      background: #1e1e1e;
+      color: #0f0;
       padding: 20px;
+      text-align: center;
     }
-    input, button {
-      margin: 10px;
+    select, input, button {
       padding: 10px;
+      margin: 10px;
       font-size: 16px;
-      width: 400px;
-      max-width: 90%;
       background: #111;
       color: #0f0;
       border: 1px solid #0f0;
     }
-    .output {
+    .results {
       margin-top: 20px;
-      font-size: 18px;
-      background: #111;
-      padding: 20px;
-      border-radius: 10px;
       border: 1px solid #0f0;
-      max-width: 90%;
+      padding: 20px;
+      background: #111;
+      border-radius: 10px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
     }
   </style>
 </head>
 <body>
-  <h1>🧠 Minecraft AI Seed Finder</h1>
-  <input id="prompt" type="text" placeholder="Describe what you want (e.g. 'village near desert temple')" />
-  <input id="version" type="text" placeholder="Minecraft version (e.g. 1.20.1)" />
-  <button onclick="findSeed()">🔍 Start Search</button>
-  <div class="output" id="result"></div>
+  <h1>🔮 Enchantment Calculator</h1>
+  
+  <label>Item Type:</label>
+  <select id="itemType">
+    <option>Sword</option>
+    <option>Pickaxe</option>
+    <option>Bow</option>
+    <option>Axe</option>
+    <option>Armor</option>
+  </select><br>
+
+  <label>Lapis Used (1–3):</label>
+  <input id="lapis" type="number" min="1" max="3" value="1"><br>
+
+  <label>Player Level:</label>
+  <input id="level" type="number" min="1" max="100" value="30"><br>
+
+  <button onclick="simulateEnchant()">✨ Simulate</button>
+
+  <div class="results" id="results">Result will appear here...</div>
 
   <script>
-    const seedDatabase = [
-      {
-        seed: "832045275",
-        version: "1.20+",
-        prompt: "village near desert temple"
-      },
-      {
-        seed: "-1311729346",
-        version: "1.18+",
-        prompt: "ice spikes near village"
-      },
-      {
-        seed: "778585997",
-        version: "1.19+",
-        prompt: "mushroom island"
-      },
-      {
-        seed: "564774532",
-        version: "1.19+",
-        prompt: "ancient city spawn"
-      },
-      {
-        seed: "3472192849",
-        version: "1.20+",
-        prompt: "cherry grove"
-      },
-      {
-        seed: "123987654",
-        version: "1.21",
-        prompt: "jungle temple near river"
-      },
-      {
-        seed: "426389123",
-        version: "1.21",
-        prompt: "village on cliffside"
+    const enchantments = {
+      Sword: ["Sharpness", "Looting", "Unbreaking", "Fire Aspect", "Knockback"],
+      Pickaxe: ["Efficiency", "Unbreaking", "Fortune", "Silk Touch"],
+      Bow: ["Power", "Punch", "Flame", "Infinity", "Unbreaking"],
+      Axe: ["Efficiency", "Sharpness", "Unbreaking", "Fortune"],
+      Armor: ["Protection", "Thorns", "Unbreaking", "Mending", "Fire Protection"]
+    };
+
+    function getRandomEnchants(list, level) {
+      const results = [];
+      const max = Math.min(3, Math.floor(level / 10));
+      for (let i = 0; i < max; i++) {
+        const e = list[Math.floor(Math.random() * list.length)];
+        const lvl = Math.ceil(Math.random() * Math.min(5, level / 10));
+        results.push(`${e} ${lvl}`);
       }
-    ];
+      return [...new Set(results)]; // unique
+    }
 
-    function findSeed() {
-      const inputPrompt = document.getElementById("prompt").value.trim().toLowerCase();
-      const version = document.getElementById("version").value.trim();
-      const resultBox = document.getElementById("result");
+    function simulateEnchant() {
+      const type = document.getElementById("itemType").value;
+      const level = parseInt(document.getElementById("level").value);
+      const lapis = parseInt(document.getElementById("lapis").value);
+      const enchList = enchantments[type];
+      
+      const enchants = getRandomEnchants(enchList, level);
 
-      if (!inputPrompt || !version) {
-        resultBox.innerHTML = "❗ Please enter both a prompt and version.";
-        return;
-      }
-
-      resultBox.innerHTML = "🧠 Searching for a seed that matches your prompt... please wait.";
-
-      setTimeout(() => {
-        // Simulated best match based on closest text match
-        let bestMatch = null;
-        let bestScore = 0;
-
-        for (const entry of seedDatabase) {
-          let score = 0;
-          const words = inputPrompt.split(" ");
-          for (const word of words) {
-            if (entry.prompt.toLowerCase().includes(word)) score++;
-          }
-          if (score > bestScore) {
-            bestScore = score;
-            bestMatch = entry;
-          }
-        }
-
-        // Always return best match (even if not perfect)
-        if (bestMatch) {
-          resultBox.innerHTML = `
-            ✅ Match found!<br><br>
-            🔍 Prompt: <b>${inputPrompt}</b><br>
-            🛠 Version: <b>${version}</b><br>
-            🌱 Closest match: <b>${bestMatch.prompt}</b><br>
-            🔢 Seed: <code>${bestMatch.seed}</code>
-          `;
-        } else {
-          resultBox.innerHTML = `
-            ⚠️ Could not find a close enough seed. Try a more common feature (like village, jungle, etc).
-          `;
-        }
-      }, 3000); // simulate search delay
+      document.getElementById("results").innerHTML = `
+        🛠 Item: <b>${type}</b><br>
+        🔷 Lapis: <b>${lapis}</b><br>
+        🧪 Simulated Enchants:<br>
+        <code>${enchants.join("<br>")}</code>
+      `;
     }
   </script>
 </body>
