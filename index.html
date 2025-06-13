@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Minecraft Seed Finder</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #222;
+      color: #0f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    input, button {
+      margin: 10px;
+      padding: 10px;
+      font-size: 16px;
+    }
+    .seed-box {
+      margin-top: 20px;
+      font-size: 20px;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <h1>Minecraft Seed Finder</h1>
+  <input type="text" id="prompt" placeholder="Enter a prompt (e.g. Village near desert temple)" size="50" />
+  <input type="text" id="version" placeholder="Minecraft version (e.g. 1.20.1)" />
+  <button onclick="findSeed()">Find Seed</button>
+  <div class="seed-box" id="result"></div>
+
+  <script>
+    function findSeed() {
+      const prompt = document.getElementById("prompt").value.toLowerCase();
+      const version = document.getElementById("version").value;
+      const result = document.getElementById("result");
+
+      // Simulated matching: real tool would query an AI/seed database
+      const fakeSeeds = {
+        "village near desert temple": "832045275",
+        "ice spikes near village": "-1311729346",
+        "mushroom island": "778585997",
+        "ancient city spawn": "564774532",
+        "cherry grove": "3472192849"
+      };
+
+      for (const key in fakeSeeds) {
+        if (prompt.includes(key)) {
+          result.innerHTML = `🎯 Version: ${version}<br>🧭 Seed: <b>${fakeSeeds[key]}</b><br>🌍 Feature: ${key}`;
+          return;
+        }
+      }
+
+      // Fallback random seed
+      const randomSeed = Math.floor(Math.random() * 1000000000);
+      result.innerHTML = `🎯 Version: ${version}<br>🧭 Seed: <b>${randomSeed}</b><br>🤷 No exact match found, generated random seed.`;
+    }
+  </script>
+</body>
+</html>
