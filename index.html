@@ -1,94 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="icon" href="Logo.png" type="image/png">
-  <meta charset="UTF-8" />
-  <title>Enchantment Calculator</title>
-  <style>
-    body {
-      font-family: monospace;
-      background: #1e1e1e;
-      color: #0f0;
-      padding: 20px;
-      text-align: center;
-    }
-    select, input, button {
-      padding: 10px;
-      margin: 10px;
-      font-size: 16px;
-      background: #111;
-      color: #0f0;
-      border: 1px solid #0f0;
-    }
-    .results {
-      margin-top: 20px;
-      border: 1px solid #0f0;
-      padding: 20px;
-      background: #111;
-      border-radius: 10px;
-      max-width: 500px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-  </style>
+<link rel="icon" href="Logo.png" type="image/png">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Custom Minecraft Player Head Command Generator</title>
+<style>
+  body {
+    background: #1e1e1e;
+    color: #0f0;
+    font-family: monospace;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+  input, textarea, button {
+    background: #111;
+    border: 1px solid #0f0;
+    color: #0f0;
+    font-family: monospace;
+    font-size: 16px;
+    margin: 10px 0;
+    padding: 10px;
+    width: 400px;
+    max-width: 90vw;
+  }
+  button {
+    cursor: pointer;
+  }
+  .output {
+    margin-top: 20px;
+    background: #111;
+    border: 1px solid #0f0;
+    padding: 15px;
+    border-radius: 8px;
+    max-width: 90vw;
+    white-space: pre-wrap;
+  }
+  label {
+    font-weight: bold;
+    margin-top: 10px;
+  }
+</style>
 </head>
 <body>
-  <h1>🔮 Enchantment Calculator</h1>
+  <h1>🎭 Minecraft Player Head Command Generator</h1>
   
-  <label>Item Type:</label>
-  <select id="itemType">
-    <option>Sword</option>
-    <option>Pickaxe</option>
-    <option>Bow</option>
-    <option>Axe</option>
-    <option>Armor</option>
-  </select><br>
-
-  <label>Lapis Used (1–3):</label>
-  <input id="lapis" type="number" min="1" max="3" value="1"><br>
-
-  <label>Player Level:</label>
-  <input id="level" type="number" min="1" max="100" value="30"><br>
-
-  <button onclick="simulateEnchant()">✨ Simulate</button>
-
-  <div class="results" id="results">Result will appear here...</div>
-
-  <script>
-    const enchantments = {
-      Sword: ["Sharpness", "Looting", "Unbreaking", "Fire Aspect", "Knockback"],
-      Pickaxe: ["Efficiency", "Unbreaking", "Fortune", "Silk Touch"],
-      Bow: ["Power", "Punch", "Flame", "Infinity", "Unbreaking"],
-      Axe: ["Efficiency", "Sharpness", "Unbreaking", "Fortune"],
-      Armor: ["Protection", "Thorns", "Unbreaking", "Mending", "Fire Protection"]
-    };
-
-    function getRandomEnchants(list, level) {
-      const results = [];
-      const max = Math.min(3, Math.floor(level / 10));
-      for (let i = 0; i < max; i++) {
-        const e = list[Math.floor(Math.random() * list.length)];
-        const lvl = Math.ceil(Math.random() * Math.min(5, level / 10));
-        results.push(`${e} ${lvl}`);
-      }
-      return [...new Set(results)]; // unique
+  <label for="username">Minecraft Username (optional):</label>
+  <input type="text" id="username" placeholder="Enter player username" />
+  
+  <label for="texture">OR Paste Base64 Texture String (optional):</label>
+  <textarea id="texture" rows="4" placeholder="Paste Base64 texture value here"></textarea>
+  
+  <button onclick="generateCommand()">Generate /give Command</button>
+  
+  <div class="output" id="output">Your command will appear here...</div>
+  
+<script>
+  function generateCommand() {
+    const username = document.getElementById('username').value.trim();
+    const texture = document.getElementById('texture').value.trim();
+    const output = document.getElementById('output');
+    
+    if (!username && !texture) {
+      output.textContent = '❗ Please enter a username or a Base64 texture string.';
+      return;
     }
-
-    function simulateEnchant() {
-      const type = document.getElementById("itemType").value;
-      const level = parseInt(document.getElementById("level").value);
-      const lapis = parseInt(document.getElementById("lapis").value);
-      const enchList = enchantments[type];
+    
+    let command = '/give @p ';
+    
+    if (username && !texture) {
+      // Simple player head by username
+      command += `minecraft:player_head{SkullOwner:"${username}"} 1`;
+    } else if (texture) {
+      // Custom texture head
+      // Generate a random UUID-like string for the Id (not required to be real UUID)
+      const randomId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
       
-      const enchants = getRandomEnchants(enchList, level);
-
-      document.getElementById("results").innerHTML = `
-        🛠 Item: <b>${type}</b><br>
-        🔷 Lapis: <b>${lapis}</b><br>
-        🧪 Simulated Enchants:<br>
-        <code>${enchants.join("<br>")}</code>
-      `;
+      command += `player_head{SkullOwner:{Id:"${randomId}",Properties:{textures:[{Value:"${texture}"}]}}} 1`;
+    } else {
+      output.textContent = '❗ Please enter either username or texture.';
+      return;
     }
-  </script>
+    
+    output.textContent = command;
+  }
+</script>
 </body>
 </html>
