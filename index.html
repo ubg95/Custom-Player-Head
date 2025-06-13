@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="icon" href="Logo.png" type="image/png">
   <meta charset="UTF-8">
   <title>Minecraft AI Seed Finder</title>
   <style>
@@ -38,7 +39,7 @@
   <h1>🧠 Minecraft AI Seed Finder</h1>
   <input id="prompt" type="text" placeholder="Describe what you want (e.g. 'village near desert temple')" />
   <input id="version" type="text" placeholder="Minecraft version (e.g. 1.20.1)" />
-  <button onclick="findSeed()">🔍 Find Seed</button>
+  <button onclick="findSeed()">🔍 Start Search</button>
   <div class="output" id="result"></div>
 
   <script>
@@ -46,71 +47,84 @@
       {
         seed: "832045275",
         version: "1.20+",
-        description: "village near desert temple, great for early loot"
+        prompt: "village near desert temple"
       },
       {
         seed: "-1311729346",
         version: "1.18+",
-        description: "ice spikes biome near village and ravine"
+        prompt: "ice spikes near village"
       },
       {
         seed: "778585997",
         version: "1.19+",
-        description: "massive mushroom island surrounded by ocean"
+        prompt: "mushroom island"
       },
       {
         seed: "564774532",
         version: "1.19+",
-        description: "spawn near ancient city and big cave system"
+        prompt: "ancient city spawn"
       },
       {
         seed: "3472192849",
         version: "1.20+",
-        description: "spawn in cherry grove with valley view"
+        prompt: "cherry grove"
+      },
+      {
+        seed: "123987654",
+        version: "1.21",
+        prompt: "jungle temple near river"
+      },
+      {
+        seed: "426389123",
+        version: "1.21",
+        prompt: "village on cliffside"
       }
     ];
 
     function findSeed() {
-      const prompt = document.getElementById("prompt").value.toLowerCase();
-      const version = document.getElementById("version").value;
+      const inputPrompt = document.getElementById("prompt").value.trim().toLowerCase();
+      const version = document.getElementById("version").value.trim();
       const resultBox = document.getElementById("result");
 
-      if (!prompt || !version) {
+      if (!inputPrompt || !version) {
         resultBox.innerHTML = "❗ Please enter both a prompt and version.";
         return;
       }
 
-      // AI-like matching: basic keyword scoring
-      let bestMatch = null;
-      let bestScore = 0;
+      resultBox.innerHTML = "🧠 Searching for a seed that matches your prompt... please wait.";
 
-      for (const entry of seedDatabase) {
-        const desc = entry.description.toLowerCase();
-        let score = 0;
-        prompt.split(" ").forEach(word => {
-          if (desc.includes(word)) score++;
-        });
+      setTimeout(() => {
+        // Simulated best match based on closest text match
+        let bestMatch = null;
+        let bestScore = 0;
 
-        if (score > bestScore) {
-          bestScore = score;
-          bestMatch = entry;
+        for (const entry of seedDatabase) {
+          let score = 0;
+          const words = inputPrompt.split(" ");
+          for (const word of words) {
+            if (entry.prompt.toLowerCase().includes(word)) score++;
+          }
+          if (score > bestScore) {
+            bestScore = score;
+            bestMatch = entry;
+          }
         }
-      }
 
-      if (bestMatch && bestScore > 0) {
-        resultBox.innerHTML = `
-          🎯 Prompt: <b>${prompt}</b><br>
-          🛠 Version: <b>${version}</b><br>
-          🌱 Best Match: <b>${bestMatch.description}</b><br>
-          🔢 Seed: <code>${bestMatch.seed}</code>
-        `;
-      } else {
-        const randomSeed = Math.floor(Math.random() * 999999999);
-        resultBox.innerHTML = `
-          😕 No good match found for "<b>${prompt}</b>"<br>
-          🔁 Generated random seed instead: <code>${randomSeed}</code>
-        `;
-      }
+        // Always return best match (even if not perfect)
+        if (bestMatch) {
+          resultBox.innerHTML = `
+            ✅ Match found!<br><br>
+            🔍 Prompt: <b>${inputPrompt}</b><br>
+            🛠 Version: <b>${version}</b><br>
+            🌱 Closest match: <b>${bestMatch.prompt}</b><br>
+            🔢 Seed: <code>${bestMatch.seed}</code>
+          `;
+        } else {
+          resultBox.innerHTML = `
+            ⚠️ Could not find a close enough seed. Try a more common feature (like village, jungle, etc).
+          `;
+        }
+      }, 3000); // simulate search delay
     }
   </script>
 </body>
